@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2025-08-12T12:19:45.477070972Z</date>
+  <millis>1755001185477</millis>
+  <nanos>70972</nanos>
+  <sequence>0</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>org.bitvx.AppServer.Main</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Server started in port 8088</message>
+</record>
+</log>

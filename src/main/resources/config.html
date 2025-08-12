@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>初次配置 BitVX AppServer</title>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: STXihei, "华文细黑", "Microsoft YaHei", "微软雅黑";
+            }
+
+            /* 主容器使用Flex布局 */
+            .main-container {
+                display: flex;
+                height: 100%;
+            }
+
+            .list {
+                border-radius: 10px;
+                background-color: ghostwhite;
+                color: black;
+                width: 225px;
+                padding: 0 10px;
+            }
+
+            /* 右侧内容区域 */
+            .content {
+                flex: 1; /* 占据剩余所有空间 */
+                display: flex;
+                justify-content: center; /* 水平居中 */
+                align-items: center; /* 垂直居中 */
+                padding: 20px;
+            }
+
+            .content-card {
+                text-align: center;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+                padding-top: 10px;
+                font-family: Arial, Helvetica, sans-serif;
+                text-align: center;
+            }
+
+            .list ol {
+                list-style: none;
+                padding-left: 20px;
+            }
+
+            .child {
+                margin-top: 15px;
+                padding: 8px 12px;
+                border-radius: 8px;
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .child::before {
+                content: counter(list-item);
+                position: absolute;
+                left: -16px;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+
+            .selected {
+                color: black;
+                background-color: #e0efff;
+                font-weight: bold;
+            }
+
+            .selected::before {
+                background-color: #4285f4;
+                color: white;
+            }
+
+            .unselected {
+                color: dimgray;
+            }
+
+            .unselected::before {
+                background-color: #e0e0e0;
+                color: dimgray;
+            }
+
+            .big-emoji {
+                font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Droid Sans', sans-serif;
+                font-size: 65px;
+            }
+
+            button {
+                padding-left: 20px;
+                padding-right: 20px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                text-decoration: none;
+                display: inline-block;
+                background-color: #4285f4;
+                border: none;
+                border-radius: 5px;
+                color: white;
+            }
+
+            button:hover {
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+            }
+
+            input {
+                background-color: white;
+                color: #0F0F0F;
+                border-radius: 5px;
+                border-color: grey;
+                height: 24px;
+                font-size: 12px;
+            }
+        </style>
+        <script>
+            function ready_to_set_password() {
+                document.getElementById('st1').style.display = 'none';
+                document.getElementById('st2').style.display = 'block';
+                document.getElementById('st2ls').classList.add('selected');
+                document.getElementById('st2ls').classList.remove('unselected');
+                document.getElementById('st1ls').classList.remove('selected');
+                document.getElementById('st1ls').classList.add('unselected');
+                document.title = "设置所有者密码 - BitVX AppServer";
+            }
+
+	    function set_password() {
+		var v1 = document.getElementById('password').value;
+		var v2 = document.getElementById('password').value;
+		if (v1 === v2) {
+		    xmlhttp = new XMLHttpRequest();
+		    xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 201) {
+			    ready_to_finish();
+			} else window.alert("你说的对但是请修复你的服务器。with error code " + xmlhttp.status);
+		    }
+		} else window.alert("密码前后不一致，请重试哦亲。");
+		xmlhttp.open("GET", "/setPassword/?password=" + v1);
+		xmlhttp.send();
+	    }
+
+	    function ready_to_finish() {
+		document.getElementById('st2').style.display = 'none';
+		document.getElementById('st2ls').classList.remove('selected');
+		document.getElementById('st2ls').classList.add('unselected');
+		document.getElementById('st3').style.display = 'block';
+		document.getElementById('st3ls').classList.add('selected');
+		document.getElementById('st3ls').classList.remove('unselected');
+		document.title = "恭喜完成向导！";
+	    }
+
+	    function go_dashboard() {
+		document.href = document.href + "dashboard";
+            }
+        </script>
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="list">
+                <h1 class="logo">BitVX</h1>
+                <ol>
+                    <li class="child selected" id="st1ls">欢迎！</li>
+                    <li class="child unselected" id="st2ls">配置所有者密码</li>
+		    <!-- <li class="child unselected">创建新账户</li>-->
+		    <!-- <li class="child unselected">分配工作空间</li>-->
+		    <li class="child unselected" id="st3ls">完成！</li>
+                </ol>
+            </div>
+            
+            <div class="content">
+                <div id="st1" class="content-card">
+                    <h1 class="big-emoji">🎉</h1>
+                    <h2>欢迎使用 BitVX！</h2>
+                    <p style="margin: 20px 0;">感谢使用 BitVX ，此向导将帮助您完成 BitVX AppServer 的初始设置。</p>
+                    <button onclick="ready_to_set_password();">继续</button>
+                </div>
+                <div id="st2" class="content-card" style="display: none;">
+                    <h1 class="big-emoji">🔑</h1>
+                    <h2>配置管理员密码</h2>
+                    <br/>
+                    <input id="password" type="password" name="password"></input><br/>
+                    <input id="password_again" type="password" name="password_again"></input><br/>
+                    <button onclick="set_password()">继续</button>
+                </div>
+		<div id="st3" class="content-card" style="display: none;">
+		    <h1 class="big-emoji">��</h1>
+		    <h2>完成！</h2>
+		    <p style="margin: 20px 0;">恭喜你完成了配置向导！</p>
+		    <button onclick="go_dashboard()">进入仪表盘</button>
+		</div>
+            </div>
+        </div>
+    </body>
+</html>
