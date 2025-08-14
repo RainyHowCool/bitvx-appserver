@@ -1,59 +1,60 @@
 package org.bitvx.AppServer.bitdb;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
-import org.bitvx.AppServer.utils.ByteUtils;
+import org.bitvx.AppServer.utils.AdvInputStream;
+import static org.bitvx.AppServer.utils.AdvInputStream.INT_SIZE;
+import static org.bitvx.AppServer.utils.AdvInputStream.LAST;
+import org.bitvx.AppServer.utils.DoubleInteger;
 
 public class BitDBHandle {
-    private Map<String, Integer> tables = new HashMap<String, Integer>();
+    private final AdvInputStream stream;
+    private final Map<String, DoubleInteger> tables = new HashMap<>();
 
-    public BitDBHandle(InputStream stream) throws IOException, IllegalArgumentException {
-        byte[] magicNumber = new byte[4]; 
-        byte[] indexOffestRaw = new byte[4];
-        byte[] dataAreaOffestRaw = new byte[4];
-        int indexOffest;
-        int dataAreaOffest;
-        int bytesRead;
+    private int dataRegionOffest;
 
-        byte[] magicNumberRight = new byte[4];
-        magicNumberRight[0] = 'X';
-        magicNumberRight[1] = 'K';
-        magicNumberRight[2] = 'D';
-        magicNumberRight[3] = 'B';
+    public BitDBHandle(AdvInputStream stream) throws IOException, IllegalArgumentException {
+        this.stream = stream;
+        // 基本变量定义
+        int indexOffest, indexLength, indexEnd;
+        int indexPtr;
 
-        byte[] lengthOfTableNameRaw = new byte[1];
-        int lengthOfTableName;
-        byte[] offestOfTableRaw = new byte[4];
-        byte offestOfTable;
+        byte[] magicNumberRight = "VXDB".getBytes(StandardCharsets.US_ASCII);
 
-        if ((bytesRead = stream.read(magicNumber)) != 4 || magicNumber != magicNumberRight) {
+        String tableName;
+        int lengthOfTableName, offestOfTable, tableLength;
+
+        if (stream.readToByteArray(LAST, INT_SIZE) != magicNumberRight) {
             throw new IllegalArgumentException();
         }
 
-        if ((bytesRead = stream.read(indexOffestRaw)) == 4) {
-            indexOffest = ByteUtils.byteArrayToInt(indexOffestRaw);
-        } else {
-           throw new IllegalArgumentException();
+        indexOffest = stream.readToInt(LAST);
+        indexLength = stream.readToInt(LAST);
+        dataRegionOffest = stream.readToInt(LAST);
+
+        indexEnd = indexOffest + indexLength;
+
+        indexPtr = indexOffest;
+
+        while ((indexEnd - indexPtr) != 0) {
+            lengthOfTableName = stream.readToInt(indexPtr);
+            indexPtr += 4;
+            offestOfTable = stream.readToInt(indexPtr);
+            indexPtr += 4;
+            tableLength = stream.readToInt(indexPtr);
+            indexPtr += 4;
+            tableName = stream.readToString(indexPtr, lengthOfTableName);
+            indexPtr += lengthOfTableName;
+            tables.put(tableName, new DoubleInteger(offestOfTable, tableLength));
         }
 
-        if ((bytesRead = stream.read(dataAreaOffestRaw, indexOffest, 4)) == 4) {
-            indexOffest = ByteUtils.byteArrayToInt(dataAreaOffestRaw);
-        } else {
-            throw new IllegalArgumentException();
-        }
-
-        if ((lengthOfTableName = stream.read(indexOffestRaw)) == -1) {
-            throw new IllegalArgumentException();
-        }
-
-        if ((bytesRead = stream.read(offestOfTableRaw)) != 4) {
-            throw new IllegalArgumentException();
-        }
-
-        offestOfTable = ByteUtils.byteArrayToInt(offestOfTableRaw);
     }
+
+    public BitDBTable getTable(String name) {
+        return new BitDBTable(stream, dataRegionOffest, tables.get(name));
+    }
+
 }
