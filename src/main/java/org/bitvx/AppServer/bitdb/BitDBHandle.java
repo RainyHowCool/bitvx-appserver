@@ -57,6 +57,6 @@ public class BitDBHandle {
     }
 
     public BitDBTable getTable(String name) throws IOException {
-        return new BitDBTable(dataRegion, dataRegionOffest, tables.get(name));
+        return new BitDBTable(dataRegion, tables.get(name));
     }
 }

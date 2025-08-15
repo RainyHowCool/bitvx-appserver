@@ -34,5 +34,5 @@ function ready_to_finish() {
 }
 
 function go_dashboard() {
-    document.href = document.href + "dashboard";
+    location.assign("/dashboard");
 }

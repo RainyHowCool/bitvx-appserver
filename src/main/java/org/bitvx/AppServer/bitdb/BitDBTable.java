@@ -34,14 +34,14 @@ public class BitDBTable {
         tableData = subByteArray(dataRegion, ptr, dataRegion.length);
     }
 
-    public BitDBValue getRaw(String columnName, int line) throws IOException {
+    /*public BitDBValue getRaw(String columnName, int line) throws IOException {
         if (line == 0) {
             throw new IOException();
         }
         int ptr = 0, columnNow = 0;
         ColumnInstance instance = null;
         for (Map.Entry<String, ColumnInstance> entry : columns.entrySet()) {
-            if ("columnName".equals(entry.getKey())) {
+            if (columnName.equals(entry.getKey())) {
                 instance = entry.getValue();
             }
         }
@@ -56,12 +56,14 @@ public class BitDBTable {
                 if (columnNow == columnCount) {
                     throw new IOException();
                 }
+
             }
 
             ptr++;
         }
-    }
+    }*/
 }
+
 
 class ColumnInstance {
     private final BitDBType type;
