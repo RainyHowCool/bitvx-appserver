@@ -1,15 +1,13 @@
 package org.bitvx.AppServer;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.bitvx.AppServer.config.FirstConfigHandler;
+
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.bitvx.AppServer.config.FirstConfigHandler;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 public class RedirectHandler implements HttpHandler {
     @Override
